@@ -1,0 +1,29 @@
+version: '2'
+
+services:
+  
+  # Define an InfluxDB service
+  influxdb:
+    image: influxdb
+    volumes:
+      - ./data/influxdb:/var/lib/influxdb
+    network_mode: "host"
+  # Define a Chronograf service
+  chronograf:
+    image: chronograf
+    volumes:
+      - ./data/chronograf:/var/lib/chronograf
+    network_mode: "host"
+    links:
+      - influxdb
+  # Define a Kapacitor service
+  kapacitor:
+    image: kapacitor
+    environment:
+      KAPACITOR_HOSTNAME: kapacitor
+      KAPACITOR_INFLUXDB_0_URLS_0: http://influxdb:8086
+    volumes:
+      - ./data/kapacitor:/var/lib/kapacitor
+    links:
+      - influxdb
+    network_mode: "host"
