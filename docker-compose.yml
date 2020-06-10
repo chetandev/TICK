@@ -7,13 +7,15 @@ services:
     image: influxdb
     volumes:
       - ./data/influxdb:/var/lib/influxdb
-    network_mode: "host"
+    ports:
+      - "8086:8086"
   # Define a Chronograf service
   chronograf:
     image: chronograf
     volumes:
       - ./data/chronograf:/var/lib/chronograf
-    network_mode: "host"
+    ports:
+      - "8888:8888"
     links:
       - influxdb
   # Define a Kapacitor service
@@ -26,4 +28,5 @@ services:
       - ./data/kapacitor:/var/lib/kapacitor
     links:
       - influxdb
-    network_mode: "host"
+    ports:
+     -  "9092:9092"
