@@ -1,32 +1,46 @@
-version: '2'
+# This is a Docker Compose file to work with Loud ML and an InfluxDB stack.
+
+version: "3.6"
 
 services:
-  
-  # Define an InfluxDB service
+  loudml:
+    image: loudml/loudml:latest-devel
+    volumes:
+      - ./data/loudml.yml:/etc/loudml/config.yml:ro
+    ports:
+      - "8077:8077"
+    depends_on:
+      - influxdb
+
   influxdb:
     image: influxdb
-    volumes:
-      - ./data/influxdb:/var/lib/influxdb
     ports:
       - "8086:8086"
-  # Define a Chronograf service
-  chronograf:
-    image: chronograf
     volumes:
-      - ./data/chronograf:/var/lib/chronograf
+      - ./data/influxdb:/var/lib/influxdb
+
+  chronograf:
+    image: loudml/chronograf
+    depends_on:
+      - influxdb
+      - loudml
+      - kapacitor
     ports:
       - "8888:8888"
-    links:
-      - influxdb
-  # Define a Kapacitor service
+    volumes:
+      - ./data/chronograf:/var/lib/chronograf
+    environment:
+      INFLUXDB_URL: http://influxdb:8086
+      LOUDML_URL: http://loudml:8077
+      KAPACITOR_URL: http://kapacitor:9092
+
   kapacitor:
     image: kapacitor
-    environment:
-      KAPACITOR_HOSTNAME: kapacitor
-      KAPACITOR_INFLUXDB_0_URLS_0: http://influxdb:8086
+    depends_on:
+      - influxdb
     volumes:
       - ./data/kapacitor:/var/lib/kapacitor
-    links:
-      - influxdb
-    ports:
-     -  "9092:9092"
+    environment:
+      KAPACITOR_INFLUXDB_0_URLS_0: http://influxdb:8086
+
+

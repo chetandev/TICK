@@ -1,0 +1,26 @@
+---
+buckets:
+ - name: numenta
+   type: influxdb
+   addr: 10.160.15.227:8086
+   database: numenta
+   measurement: loudml
+   create_database: true
+   retention_policy: autogen
+   max_series_per_request: 2000
+ - name: output
+   type: influxdb
+   addr: 10.160.15.227:8086
+   database: output
+   measurement: loudml
+   create_database: true
+   retention_policy: autogen
+   max_series_per_request: 2000
+
+
+storage:
+  path: /var/lib/loudml
+
+server:
+  listen: 0.0.0.0:8077
+                  
